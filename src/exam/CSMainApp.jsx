@@ -3,6 +3,7 @@ import './cs-main.css';
 import './exam.css';
 import './teacher.css';
 import './landing.css';
+import './chat.css';
 import DocEditPage from './pages/DocEditPage.jsx';
 import DocListPage from './pages/DocListPage.jsx';
 import ExamEntryPage from './pages/ExamEntryPage.jsx';
@@ -17,6 +18,8 @@ import ExportPage from './pages/ExportPage.jsx';
 import LandingPage from './pages/LandingPage.jsx';
 import PracticePaperPage from './pages/PracticePaperPage.jsx';
 import ExamApp from './ExamApp.jsx';
+import ChatView from './components/ChatView.jsx';
+import NotebookView from './components/NotebookView.jsx';
 import { CACHED_EXAM_RESULTS, EXAM_DOCUMENTS } from './cachedExams.js';
 import { DEMO_EXAM } from './demoData.js';
 
@@ -72,7 +75,7 @@ export default function CSMainApp() {
       if (quickGradeMode) {
         setQuickGradeMode(false);
         setExamFlow(true);
-        setRoute('exam-app');
+        setRoute('ai-assistant');
       } else {
         setRoute('cs-edit');
       }
@@ -84,7 +87,7 @@ export default function CSMainApp() {
   const handleEditConfirm = (files) => {
     setCapturedFiles(files);
     if (examFlow) {
-      setRoute('exam-workbench');
+      setRoute('ai-assistant');
     } else {
       setRoute('cs-list');
     }
@@ -182,7 +185,7 @@ export default function CSMainApp() {
   };
 
   const handleWorkbenchGrade = () => {
-    setRoute('exam-app');
+    setRoute('ai-assistant');
   };
 
   const handleWorkbenchStar = () => {
@@ -208,10 +211,10 @@ export default function CSMainApp() {
     if (doc) {
       setCapturedFiles([doc.thumb]);
       setExamFlow(true);
-      setRoute('exam-workbench');
+      setRoute('ai-assistant');
     } else {
       setExamFlow(false);
-      setRoute('exam-app');
+      setRoute('ai-assistant');
     }
   };
 
@@ -353,6 +356,58 @@ export default function CSMainApp() {
           }}
         />
       </>
+    );
+  }
+
+  // === AI Assistant (对话式学习助手) ===
+  if (route === 'ai-assistant') {
+    let aiCachedResult = null;
+    if (cachedExamId === 'demo') {
+      aiCachedResult = DEMO_EXAM;
+    } else if (cachedExamId && CACHED_EXAM_RESULTS[cachedExamId]) {
+      aiCachedResult = CACHED_EXAM_RESULTS[cachedExamId];
+    } else if (examGradeResult) {
+      aiCachedResult = examGradeResult;
+    }
+    return (
+      <>
+        {hiddenInputs}
+        <ChatView
+          files={capturedFiles}
+          cachedExamId={cachedExamId}
+          cachedResult={aiCachedResult}
+          autoStart={!!aiCachedResult || (capturedFiles.length > 0)}
+          onBack={() => {
+            setRoute('exam-entry');
+            setCapturedFiles([]);
+            setCachedExamId(null);
+            setExamGradeResult(null);
+          }}
+          onTabChange={(tab) => {
+            if (tab === 'notebook') setRoute('ai-notebook');
+            else if (tab === 'wrongbook') {
+              setExamInitialStep('wrongbook');
+              setRoute('exam-app');
+            } else if (tab === 'report') {
+              setExamInitialStep('report');
+              setRoute('exam-app');
+            }
+          }}
+        />
+      </>
+    );
+  }
+
+  // === AI Notebook ===
+  if (route === 'ai-notebook') {
+    return (
+      <NotebookView
+        onBack={() => setRoute('ai-assistant')}
+        onPractice={(result) => {
+          showToast(`已生成${result.questions?.length || 0}道练习`);
+          setRoute('ai-assistant');
+        }}
+      />
     );
   }
 
