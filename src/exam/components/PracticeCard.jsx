@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
-export default function PracticeCard({ question, onAnswer }) {
+export default function PracticeCard({ question, onAnswer, answered }) {
   const [selected, setSelected] = useState(null);
-  const [revealed, setRevealed] = useState(false);
+  const [revealed, setRevealed] = useState(answered || false);
   const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
 
   const handleSelect = (letter) => {
@@ -24,10 +24,11 @@ export default function PracticeCard({ question, onAnswer }) {
 
       <p className="cv-prac-question">{question.question}</p>
 
-      {question.options && question.options.length > 0 && (
+      {question.options && question.options.length > 0 ? (
         <div className="cv-prac-options">
           {question.options.map((opt, i) => {
             const letter = letters[i];
+            const optText = opt.replace(/^[A-F][.、]\s*/, '');
             let cls = 'cv-prac-option';
             if (revealed) {
               if (letter === question.answer) cls += ' cv-prac-correct';
@@ -39,10 +40,23 @@ export default function PracticeCard({ question, onAnswer }) {
             return (
               <button key={i} className={cls} onClick={() => handleSelect(letter)} disabled={revealed}>
                 <span className="cv-prac-letter">{letter}</span>
-                <span className="cv-prac-text">{opt}</span>
+                <span className="cv-prac-text">{optText}</span>
               </button>
             );
           })}
+        </div>
+      ) : (
+        <div className="cv-prac-fill">
+          {!revealed && (
+            <button className="cv-prac-reveal-btn" onClick={() => { setRevealed(true); onAnswer(question, ''); }}>
+              查看答案
+            </button>
+          )}
+          {revealed && (
+            <div className="cv-prac-answer-reveal">
+              <span className="cv-prac-exp-label">答案：</span>{question.answer}
+            </div>
+          )}
         </div>
       )}
 

@@ -1,3 +1,5 @@
+import { PREGRADE_CACHE } from '../pregradeCache.js';
+
 const ZHIPU_API_KEY = 'caa4b333b81041feae2b2268a36bcc84.O0wJBlQIlcF0yEmT';
 const ZHIPU_API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
 
@@ -5,6 +7,56 @@ const MAX_RETRIES = 1;
 const USE_DEMO = !ZHIPU_API_KEY || ZHIPU_API_KEY === 'your_zhipu_api_key';
 
 const _cache = new Map();
+
+const FILENAME_ALIASES = {
+  '5NFfaS5PHSg81Ff2K20a8daY': '七年级数学',
+  '7dHyKX2haYaA57aBFW694CAS': '数据的收集与整理试卷',
+  '纯文本-739398': '语文期末测试',
+  '试卷作业_45365': '生物试卷作业_45365',
+  'C488hA2E866dtdLJA8E3J6We': '四年级下册语文',
+};
+
+function matchPregradeCache(fileNames) {
+  if (!fileNames || fileNames.length === 0) return null;
+  for (const name of fileNames) {
+    if (!name) continue;
+    const decoded = decodeURIComponent(name).replace(/\?.*$/, '').replace('.jpg', '').replace('.png', '');
+    const resolved = FILENAME_ALIASES[decoded] || decoded;
+    for (const [key, value] of Object.entries(PREGRADE_CACHE)) {
+      const cacheKey = key.replace('.jpg', '');
+      if (resolved.includes(cacheKey) || cacheKey.includes(resolved)) {
+        if (value.questions && value.questions.length > 0) {
+          const result = { questions: value.questions };
+          if (value.notes) result._cachedNotes = value.notes;
+          return result;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+export function getCachedNotes(questions) {
+  if (!questions || questions.length === 0) return null;
+  const topics = questions.map(q => q.topic).filter(Boolean);
+  for (const [key, value] of Object.entries(PREGRADE_CACHE)) {
+    if (!value.notes) continue;
+    const cacheTopics = Object.keys(value.notes);
+    if (topics.some(t => cacheTopics.includes(t))) {
+      return value.notes;
+    }
+  }
+  return null;
+}
+
+export function getCachedExplanation(topic) {
+  if (!topic) return null;
+  for (const [key, value] of Object.entries(PREGRADE_CACHE)) {
+    if (!value.explanations) continue;
+    if (value.explanations[topic]) return value.explanations[topic];
+  }
+  return null;
+}
 
 export async function fileToBase64Public(file) {
   return fileToBase64(file);
@@ -183,6 +235,13 @@ export async function recognizeExam(files) {
   const cached = findCachedResult(files);
   if (cached) return cached;
 
+  const fileNames = files.map(f => typeof f === 'string' ? f.split('/').pop() : (f.name || ''));
+
+  const pregradeHit = matchPregradeCache(fileNames);
+  if (pregradeHit) {
+    return { imageBase64List: [], pages: files.length, fileNames, _pregradeHit: pregradeHit };
+  }
+
   const imageBase64List = [];
   for (const file of files) {
     if (typeof file === 'string') {
@@ -196,7 +255,7 @@ export async function recognizeExam(files) {
     }
   }
 
-  return { imageBase64List, pages: files.length };
+  return { imageBase64List, pages: files.length, fileNames };
 }
 
 function expandQuestions(questions) {
@@ -233,7 +292,29 @@ export async function gradeExam(ocrResult) {
     return DEMO_EXAM;
   }
 
-  const visionPrompt = '批改这份试卷。每大题一条，correctAnswer用数组表示各小题答案。选择题请在content里包含各小题题目摘要。JSON数组格式（只返回合法JSON）：[{"number":1,"content":"题目描述","userAnswer":"未作答","correctAnswer":"答案或字符串数组","correct":false,"subject":"语文","topic":"知识点"}]';
+  if (ocrResult._pregradeHit) {
+    await new Promise(r => setTimeout(r, 300));
+    return ocrResult._pregradeHit;
+  }
+
+  const pregradeHit = matchPregradeCache(ocrResult.fileNames);
+  if (pregradeHit) {
+    await new Promise(r => setTimeout(r, 300));
+    return pregradeHit;
+  }
+
+  const visionPrompt = `请仔细分析这份试卷图片，完成以下任务：
+1. 识别每道题的题目内容和所有选项（A/B/C/D的完整文本）
+2. 识别学生在试卷上的作答标记（勾选✓、圈、划线、手写字母等都是学生选择的答案）
+3. 根据题目内容，推理出每道题的正确答案
+4. 对比学生答案和正确答案，判断对错
+
+注意：试卷上的✓或圈等标记是学生选择的答案，不是批改结果。
+
+返回JSON数组格式（只返回合法JSON，不要其他文字）：
+[{"number":1,"content":"题目摘要","options":["A选项内容","B选项内容","C选项内容","D选项内容"],"userAnswer":"学生选的字母如A","correctAnswer":"正确答案字母如B","correct":true或false,"subject":"学科","topic":"知识点"}]
+
+重要：options字段必须包含每道选择题的4个选项的完整文本内容。`;
 
   const content = await callZhipuVision(ocrResult.imageBase64List, visionPrompt);
 
@@ -286,6 +367,13 @@ export async function getQuestionAnswer(question, onStream) {
     return result;
   }
 
+  const cached = getCachedExplanation(question.topic);
+  if (cached) {
+    await new Promise(r => setTimeout(r, 300));
+    if (onStream) onStream(cached);
+    return cached;
+  }
+
   const systemPrompt = `你是K12教师，讲解通俗易懂。对题目给出：解题思路、步骤、核心知识点。JSON格式：{"explanation":"思路","steps":["步骤1",...],"keyPoint":"知识点"}。只返回JSON。`;
 
   const messages = [
@@ -324,24 +412,28 @@ export async function generatePractice(question, count = 3, onStream) {
   if (USE_DEMO) {
     await new Promise(r => setTimeout(r, 400));
     const practices = [
-      { question: '在下列城市中，哪个城市的地铁线路总长度最长？', options: ['A. 北京', 'B. 上海', 'C. 广州', 'D. 深圳'], answer: 'B', explanation: '上海地铁总里程最长，截至2024年已超过800公里', topic: question.topic },
-      { question: '以下哪个城市的高速铁路站点数量最多？', options: ['A. 武汉', 'B. 郑州', 'C. 南京', 'D. 长沙'], answer: 'B', explanation: '郑州作为全国铁路枢纽，高铁站点数量居全国前列', topic: question.topic },
-      { question: '在以下国家中，哪个国家的手机用户数量最多？', options: ['A. 美国', 'B. 印度', 'C. 中国', 'D. 巴西'], answer: 'C', explanation: '中国手机用户数量超过16亿，全球第一', topic: question.topic },
+      { question: '在下列城市中，哪个城市的地铁线路总长度最长？', options: ['A. 北京', 'B. 上海', 'C. 广州', 'D. 深圳'], answer: 'B', explanation: '上海地铁总里程最长，截至2024年已超过800公里。', topic: question.topic },
+      { question: '以下哪个城市的高速铁路站点数量最多？', options: ['A. 武汉', 'B. 郑州', 'C. 南京', 'D. 长沙'], answer: 'B', explanation: '郑州作为全国铁路枢纽，高铁站点数量居全国前列。', topic: question.topic },
+      { question: '在以下国家中，哪个国家的手机用户数量最多？', options: ['A. 美国', 'B. 印度', 'C. 中国', 'D. 巴西'], answer: 'C', explanation: '中国手机用户数量超过16亿，全球第一。', topic: question.topic },
     ];
     const result = practices.slice(0, count);
     if (onStream) onStream(result);
     return result;
   }
 
-  const isChoice = question.correctAnswer && /^[A-D]/.test(question.correctAnswer.trim());
-  const formatHint = isChoice
-    ? '必须是选择题，包含4个选项。JSON数组：[{"question":"题目","options":["A. xxx","B. xxx","C. xxx","D. xxx"],"answer":"正确选项字母","explanation":"解析","topic":"知识点"}]'
-    : 'JSON数组：[{"question":"题目","answer":"答案","explanation":"解析","topic":"知识点"}]';
-  const systemPrompt = `K12出题专家。基于原题生成${count}道类似练习（同知识点，难度相近）。${formatHint}。只返回JSON。`;
+  const systemPrompt = `K12出题专家。基于原题生成${count}道类似练习题。要求：
+- 必须是选择题格式，每题必须有4个选项
+- 同知识点，难度相近，但不重复原题
+- options数组中每个选项必须以"A. ""B. ""C. ""D. "开头
 
+严格按以下JSON数组格式返回（只返回合法JSON，不要其他文字）：
+[{"question":"题目内容","options":["A. 选项1","B. 选项2","C. 选项3","D. 选项4"],"answer":"正确选项字母(A/B/C/D)","explanation":"解析说明","topic":"知识点"}]`;
+
+  const optionsHint = question.options ? `\n原题选项：${question.options.join(' / ')}` : '';
+  const seed = Math.random().toString(36).slice(2, 6);
   const messages = [
     { role: 'system', content: systemPrompt },
-    { role: 'user', content: `原题：${question.content}\n答案：${question.correctAnswer}\n知识点：${question.topic}` },
+    { role: 'user', content: `原题：${question.content}${optionsHint}\n正确答案：${question.correctAnswer}\n知识点：${question.topic}\n(请生成不同于之前的新题#${seed})` },
   ];
 
   if (onStream) {
@@ -353,7 +445,9 @@ export async function generatePractice(question, count = 3, onStream) {
     });
     try {
       const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      return JSON.parse(jsonStr);
+      let parsed = JSON.parse(jsonStr);
+      if (!Array.isArray(parsed)) parsed = [parsed];
+      return parsed.map(normalizeQuizQuestion);
     } catch {
       return [{ question: content, answer: '请参考解题方法', topic: question.topic }];
     }
@@ -362,24 +456,40 @@ export async function generatePractice(question, count = 3, onStream) {
   const content = await callZhipuAI(messages);
   try {
     const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    return JSON.parse(jsonStr);
+    let parsed = JSON.parse(jsonStr);
+    if (!Array.isArray(parsed)) parsed = [parsed];
+    return parsed.map(normalizeQuizQuestion);
   } catch {
     return [{ question: content, answer: '请参考解题方法', topic: question.topic }];
   }
+}
+
+function normalizeQuizQuestion(q) {
+  const letters = ['A', 'B', 'C', 'D'];
+  if (q.options && q.options.length >= 4) {
+    q.options = q.options.slice(0, 4).map((opt, i) => {
+      const stripped = opt.replace(/^[A-D][.、:：\s]+/, '').trim();
+      return `${letters[i]}. ${stripped}`;
+    });
+  }
+  if (q.answer && q.answer.length > 1 && /^[A-D]/.test(q.answer)) {
+    q.answer = q.answer[0];
+  }
+  return q;
 }
 
 export async function generateReviewQuiz(wrongQuestions, count = 5) {
   if (USE_DEMO) {
     await new Promise(r => setTimeout(r, 500));
     const demoBank = [
-      { q: '为了解全市中学生视力情况，下列调查方式最合理的是', opts: ['全市普查', '随机抽样调查1000名学生', '只调查一所学校', '只调查近视学生'], ans: 'B', topic: '抽样方法' },
-      { q: '下列数据的收集方式中，属于普查的是', opts: ['调查全班同学的身高', '调查全市空气质量', '调查全国人口的收入', '了解一批灯泡的使用寿命'], ans: 'A', topic: '普查与抽样' },
-      { q: '在统计图中，能直观反映数据变化趋势的是', opts: ['条形统计图', '扇形统计图', '折线统计图', '频数直方图'], ans: 'C', topic: '统计图选择' },
-      { q: '样本容量是指', opts: ['总体中个体的数目', '样本中个体的数目', '抽样的次数', '数据的范围'], ans: 'B', topic: '总体与样本' },
-      { q: '如果生态系统中某一环节的生物大量减少，该生态系统会', opts: ['完全不受影响', '短期波动后恢复', '立即崩溃', '其他生物全部死亡'], ans: 'B', topic: '生态系统功能' },
-      { q: '下列属于生物影响环境的实例是', opts: ['骆驼能生活在沙漠', '蚯蚓疏松土壤', '北极熊皮毛是白色', '鱼用鳃呼吸'], ans: 'B', topic: '生物与环境' },
-      { q: '有理数-3的绝对值是', opts: ['-3', '3', '1/3', '-1/3'], ans: 'B', topic: '有理数' },
-      { q: '用科学记数法表示56000，正确的是', opts: ['56×10³', '5.6×10⁴', '0.56×10⁵', '5.6×10³'], ans: 'B', topic: '科学记数法' },
+      { q: '为了解全市中学生视力情况，下列调查方式最合理的是', opts: ['A. 全市普查', 'B. 随机抽样调查1000名学生', 'C. 只调查一所学校', 'D. 只调查近视学生'], ans: 'B', topic: '抽样方法' },
+      { q: '下列数据的收集方式中，属于普查的是', opts: ['A. 调查全班同学的身高', 'B. 调查全市空气质量', 'C. 调查全国人口的收入', 'D. 了解一批灯泡的使用寿命'], ans: 'A', topic: '普查与抽样' },
+      { q: '在统计图中，能直观反映数据变化趋势的是', opts: ['A. 条形统计图', 'B. 扇形统计图', 'C. 折线统计图', 'D. 频数直方图'], ans: 'C', topic: '统计图选择' },
+      { q: '样本容量是指', opts: ['A. 总体中个体的数目', 'B. 样本中个体的数目', 'C. 抽样的次数', 'D. 数据的范围'], ans: 'B', topic: '总体与样本' },
+      { q: '如果生态系统中某一环节的生物大量减少，该生态系统会', opts: ['A. 完全不受影响', 'B. 短期波动后恢复', 'C. 立即崩溃', 'D. 其他生物全部死亡'], ans: 'B', topic: '生态系统功能' },
+      { q: '下列属于生物影响环境的实例是', opts: ['A. 骆驼能生活在沙漠', 'B. 蚯蚓疏松土壤', 'C. 北极熊皮毛是白色', 'D. 鱼用鳃呼吸'], ans: 'B', topic: '生物与环境' },
+      { q: '有理数-3的绝对值是', opts: ['A. -3', 'B. 3', 'C. 1/3', 'D. -1/3'], ans: 'B', topic: '有理数' },
+      { q: '用科学记数法表示56000，正确的是', opts: ['A. 56×10³', 'B. 5.6×10⁴', 'C. 0.56×10⁵', 'D. 5.6×10³'], ans: 'B', topic: '科学记数法' },
     ];
     const subjects = [...new Set(wrongQuestions.map(q => q.subject))];
     const relevantBank = demoBank.filter(d => wrongQuestions.some(wq => wq.topic === d.topic));
@@ -393,7 +503,13 @@ export async function generateReviewQuiz(wrongQuestions, count = 5) {
     }));
   }
 
-  const systemPrompt = `K12复习测验专家。根据错题记录生成${count}道针对性选择题（不重复原题，针对薄弱点）。JSON数组：[{"question":"题目","options":["A选项","B选项","C选项","D选项"],"answer":"正确选项字母","explanation":"解析","topic":"知识点"}]。只返回JSON。`;
+  const systemPrompt = `K12复习测验专家。根据错题记录生成${count}道针对性选择题。要求：
+- 不重复原题，针对薄弱知识点
+- 每题必须有4个选项，选项以"A. ""B. ""C. ""D. "开头
+- answer字段只填正确选项的字母(A/B/C/D)
+
+严格按以下JSON数组格式返回（只返回合法JSON）：
+[{"question":"题目","options":["A. 选项1","B. 选项2","C. 选项3","D. 选项4"],"answer":"A","explanation":"解析","topic":"知识点"}]`;
 
   const wrongSummary = wrongQuestions.slice(0, 8).map(q => `${q.content}(${q.topic},错:${q.userAnswer},对:${q.correctAnswer})`).join('; ');
 
@@ -404,7 +520,9 @@ export async function generateReviewQuiz(wrongQuestions, count = 5) {
 
   try {
     const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    return JSON.parse(jsonStr);
+    let parsed = JSON.parse(jsonStr);
+    if (!Array.isArray(parsed)) parsed = [parsed];
+    return parsed.map(normalizeQuizQuestion);
   } catch {
     return wrongQuestions.slice(0, count).map((q, i) => ({
       question: `复习题${i+1}：与"${q.content}"相关的练习`,

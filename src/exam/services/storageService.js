@@ -175,6 +175,55 @@ export function getExamResult(examId) {
   }
 }
 
+// === 按试卷隔离的数据 ===
+export function getExamMessages(examId) {
+  try {
+    return JSON.parse(localStorage.getItem(`cs_exam_msgs_${examId}`)) || [];
+  } catch { return []; }
+}
+
+export function saveExamMessages(examId, messages) {
+  try {
+    localStorage.setItem(`cs_exam_msgs_${examId}`, JSON.stringify(messages.slice(-200)));
+  } catch {}
+}
+
+export function getExamNotes(examId) {
+  try {
+    return JSON.parse(localStorage.getItem(`cs_exam_notes_${examId}`)) || [];
+  } catch { return []; }
+}
+
+export function saveExamNotes(examId, notes) {
+  try {
+    localStorage.setItem(`cs_exam_notes_${examId}`, JSON.stringify(notes.slice(0, 100)));
+  } catch {}
+}
+
+export function getExamWrong(examId) {
+  try {
+    return JSON.parse(localStorage.getItem(`cs_exam_wrong_${examId}`)) || [];
+  } catch { return []; }
+}
+
+export function saveExamWrong(examId, wrong) {
+  try {
+    localStorage.setItem(`cs_exam_wrong_${examId}`, JSON.stringify(wrong.slice(0, 100)));
+  } catch {}
+}
+
+export function getExamProgress(examId) {
+  try {
+    return JSON.parse(localStorage.getItem(`cs_exam_progress_${examId}`));
+  } catch { return null; }
+}
+
+export function saveExamProgress(examId, progress) {
+  try {
+    localStorage.setItem(`cs_exam_progress_${examId}`, JSON.stringify(progress));
+  } catch {}
+}
+
 // === 练习卷 ===
 export function savePracticePaper(paper) {
   try {

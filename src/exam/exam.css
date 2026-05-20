@@ -43,11 +43,13 @@ body { background: var(--cs-bg); }
 
 /* === Page Layout === */
 .eh-page {
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 812px;
+  max-height: 100vh;
+  max-height: 100dvh;
+  overflow-y: auto;
   background: var(--cs-bg);
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
-  max-width: 430px;
+  max-width: 375px;
   margin: 0 auto;
   position: relative;
   overflow-x: hidden;
@@ -810,7 +812,7 @@ body { background: var(--cs-bg); }
 .dep-page {
   position: fixed; inset: 0; display: flex; flex-direction: column;
   background: #f5f5f5; z-index: 100;
-  max-width: 430px; margin: 0 auto;
+  max-width: 375px; margin: 0 auto;
 }
 .dep-header {
   display: flex; align-items: center;

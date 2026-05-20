@@ -1,9 +1,11 @@
 /* === Teacher Mode Styles === */
 .teacher-page {
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 812px;
+  max-height: 100vh;
+  max-height: 100dvh;
+  overflow-y: auto;
   background: #f8f9fa;
-  max-width: 430px;
+  max-width: 375px;
   margin: 0 auto;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', sans-serif;
 }

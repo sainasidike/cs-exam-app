@@ -20,8 +20,10 @@ import PracticePaperPage from './pages/PracticePaperPage.jsx';
 import ExamApp from './ExamApp.jsx';
 import ChatView from './components/ChatView.jsx';
 import NotebookView from './components/NotebookView.jsx';
-import { CACHED_EXAM_RESULTS, EXAM_DOCUMENTS } from './cachedExams.js';
+import ExamManagePage from './components/ExamManagePage.jsx';
+import { EXAM_DOCUMENTS, EXAM_GRADABLE } from './cachedExams.js';
 import { DEMO_EXAM } from './demoData.js';
+import { getExamResult } from './services/storageService.js';
 
 const LANDING_SEEN_KEY = 'cs_landing_seen';
 
@@ -40,6 +42,7 @@ export default function CSMainApp() {
   const [toast, setToast] = useState(null);
   const [practicePaper, setPracticePaper] = useState(null);
   const [examInitialStep, setExamInitialStep] = useState(null);
+  const [examReturnRoute, setExamReturnRoute] = useState(null);
   const [quickGradeMode, setQuickGradeMode] = useState(false);
 
   const showToast = (msg) => {
@@ -138,16 +141,18 @@ export default function CSMainApp() {
     setCachedExamId('demo');
     setCapturedFiles(['/exams/7dHyKX2haYaA57aBFW694CAS.jpg']);
     setExamFlow(true);
-    setRoute('exam-workbench');
+    setRoute('ai-assistant');
   };
 
   const handleExamBack = (result) => {
     const wasFeatureEntry = !!examInitialStep;
+    const returnTo = examReturnRoute;
     setExamInitialStep(null);
+    setExamReturnRoute(null);
     if (wasFeatureEntry) {
       setExamGradeResult(null);
       setExamGraded(false);
-      setRoute('exam-entry');
+      setRoute(returnTo || 'exam-entry');
     } else if (examFlow && capturedFiles.length > 0) {
       setRoute('exam-workbench');
       if (result) {
@@ -312,6 +317,7 @@ export default function CSMainApp() {
           onLibrary={() => setRoute('exam-library')}
           onQuickGrade={handleQuickGrade}
           onFeature={(step) => {
+            setExamReturnRoute('exam-entry');
             setExamInitialStep(step);
             setCapturedFiles([]);
             setCachedExamId(null);
@@ -364,10 +370,10 @@ export default function CSMainApp() {
     let aiCachedResult = null;
     if (cachedExamId === 'demo') {
       aiCachedResult = DEMO_EXAM;
-    } else if (cachedExamId && CACHED_EXAM_RESULTS[cachedExamId]) {
-      aiCachedResult = CACHED_EXAM_RESULTS[cachedExamId];
     } else if (examGradeResult) {
       aiCachedResult = examGradeResult;
+    } else if (cachedExamId) {
+      aiCachedResult = getExamResult(cachedExamId) || null;
     }
     return (
       <>
@@ -378,17 +384,40 @@ export default function CSMainApp() {
           cachedResult={aiCachedResult}
           autoStart={!!aiCachedResult || (capturedFiles.length > 0)}
           onBack={() => {
-            setRoute('exam-entry');
+            setRoute('tabs');
+            setActiveTab('tools');
             setCapturedFiles([]);
             setCachedExamId(null);
             setExamGradeResult(null);
           }}
+          onScan={() => {
+            setExamFlow(true);
+            setQuickGradeMode(true);
+            document.getElementById('cs-album-input')?.click();
+          }}
+          onCamera={() => {
+            setExamFlow(true);
+            setQuickGradeMode(true);
+            document.getElementById('cs-camera-input')?.click();
+          }}
+          onPickDoc={() => {
+            setRoute('ai-pick-doc');
+          }}
+          onManageExams={() => {
+            setRoute('exam-manage');
+          }}
+          onSavePaper={(paper) => {
+            setPracticePaper(paper);
+            setRoute('practice-paper');
+          }}
           onTabChange={(tab) => {
-            if (tab === 'notebook') setRoute('ai-notebook');
-            else if (tab === 'wrongbook') {
+            if (tab === 'all-notebook') setRoute('ai-notebook');
+            else if (tab === 'all-wrongbook' || tab === 'wrongbook-redo' || tab === 'wrongbook-export' || tab === 'wrongbook-review') {
+              setExamReturnRoute('ai-assistant');
               setExamInitialStep('wrongbook');
               setRoute('exam-app');
-            } else if (tab === 'report') {
+            } else if (tab === 'all-report') {
+              setExamReturnRoute('ai-assistant');
               setExamInitialStep('report');
               setRoute('exam-app');
             }
@@ -407,7 +436,91 @@ export default function CSMainApp() {
           showToast(`已生成${result.questions?.length || 0}道练习`);
           setRoute('ai-assistant');
         }}
+        onSavePaper={(paper) => {
+          setPracticePaper(paper);
+          setRoute('practice-paper');
+        }}
+        onTabChange={(tab) => {
+          if (tab === 'chat') setRoute('ai-assistant');
+          else if (tab === 'wrongbook') {
+            setExamReturnRoute('ai-notebook');
+            setExamInitialStep('wrongbook');
+            setRoute('exam-app');
+          } else if (tab === 'report') {
+            setExamReturnRoute('ai-notebook');
+            setExamInitialStep('report');
+            setRoute('exam-app');
+          }
+        }}
       />
+    );
+  }
+
+  // === Exam Manage (试卷管理) ===
+  if (route === 'exam-manage') {
+    return (
+      <ExamManagePage
+        onBack={() => setRoute('ai-assistant')}
+        onSelectExam={(exam) => {
+          const result = getExamResult(exam.id) || null;
+          if (result) {
+            setCachedExamId(exam.id);
+            setExamGradeResult(result);
+            setCapturedFiles(exam.thumb ? [exam.thumb] : []);
+            setExamFlow(true);
+            setRoute('ai-assistant');
+          } else {
+            showToast('该试卷暂无批改数据');
+          }
+        }}
+      />
+    );
+  }
+
+  // === AI Pick Doc (从应用内选择文档) ===
+  if (route === 'ai-pick-doc') {
+    const appDocs = [
+      { id: 'exam-1', title: '七年级数学期末检测', thumb: '/exams/5NFfaS5PHSg81Ff2K20a8daY.jpg', subject: '数学' },
+      { id: 'exam-2', title: '数据的收集与整理', thumb: '/exams/7dHyKX2haYaA57aBFW694CAS.jpg', subject: '数学' },
+      { id: 'exam-3', title: '三年级语文模拟测试', thumb: '/exams/纯文本-739398.jpg', subject: '语文' },
+      { id: 'exam-4', title: '初中生物统一考试', thumb: '/exams/试卷作业_45365.jpg', subject: '生物' },
+      { id: 'exam-5', title: '四年级语文期中测评', thumb: '/exams/C488hA2E866dtdLJA8E3J6We.jpg', subject: '语文' },
+      { id: 'exam-6', title: '三年级道德与法治', thumb: '/exams/三年级道德与法治_thumb-1.jpg', subject: '道法' },
+    ];
+    return (
+      <div className="cv-page">
+        <div className="cv-header">
+          <button className="cv-back-btn" onClick={() => setRoute('ai-assistant')}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div className="cv-header-title">选择文档</div>
+          <div className="cv-header-right"></div>
+        </div>
+        <div className="cv-messages" style={{ padding: '16px', gap: '8px' }}>
+          <p style={{ fontSize: '13px', color: '#666', margin: '0 0 12px' }}>选择一份已扫描的文档进行 AI 批改：</p>
+          {appDocs.map(doc => (
+            <button key={doc.id} className="cv-exam-item" onClick={() => {
+              setCapturedFiles([doc.thumb]);
+              setCachedExamId(doc.id);
+              const result = getExamResult(doc.id) || null;
+              setExamGradeResult(result);
+              setExamFlow(true);
+              setRoute('ai-assistant');
+            }}>
+              <img className="cv-exam-thumb" src={doc.thumb} alt="" />
+              <div className="cv-exam-info">
+                <span className="cv-exam-title">{doc.title}</span>
+                <span className="cv-exam-meta">{doc.subject}</span>
+              </div>
+              {getExamResult(doc.id) ? (
+                <span style={{ fontSize: '11px', color: '#43A047', background: '#E8F5E9', padding: '2px 8px', borderRadius: '4px' }}>已批改</span>
+              ) : (
+                <span style={{ fontSize: '11px', color: '#999', background: '#f5f5f5', padding: '2px 8px', borderRadius: '4px' }}>待批改</span>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
     );
   }
 
@@ -416,7 +529,11 @@ export default function CSMainApp() {
     return (
       <PracticePaperPage
         paper={practicePaper}
-        onBack={() => setRoute('exam-workbench')}
+        onBack={() => {
+          if (practicePaper._from === 'notebook') setRoute('ai-notebook');
+          else if (practicePaper._from === 'chat') setRoute('ai-assistant');
+          else setRoute('exam-workbench');
+        }}
       />
     );
   }
@@ -461,7 +578,7 @@ export default function CSMainApp() {
       cachedResult = DEMO_EXAM;
       cachedDocTitle = '试卷批改示例';
     } else if (cachedExamId) {
-      cachedResult = CACHED_EXAM_RESULTS[cachedExamId] || null;
+      cachedResult = getExamResult(cachedExamId) || null;
       const cachedDoc = EXAM_DOCUMENTS.find(d => d.id === cachedExamId);
       cachedDocTitle = cachedDoc?.title || null;
     }
@@ -675,8 +792,8 @@ export default function CSMainApp() {
             ].map(doc => (
               <div key={doc.id} className="cs-exam-doc-row" onClick={() => {
                 setCapturedFiles([doc.path]);
-                setExamFlow(false);
-                setRoute('cs-list');
+                setExamFlow(true);
+                setRoute('ai-assistant');
               }}>
                 <div className="cs-exam-doc-thumb">
                   <img src={doc.path} alt={doc.title} />
@@ -727,7 +844,7 @@ export default function CSMainApp() {
               </div>
             </div>
             <div className="cs-tool-cards">
-              <div className="cs-tool-card-lg" onClick={() => setRoute('exam-entry')}>
+              <div className="cs-tool-card-lg" onClick={() => { setCachedExamId(null); setCapturedFiles([]); setExamGradeResult(null); setRoute('ai-assistant'); }}>
                 <span className="cs-tool-card-title">试卷智能助手</span>
                 <div className="cs-tool-card-img">
                   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" strokeWidth="1"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg>

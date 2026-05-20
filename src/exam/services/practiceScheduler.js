@@ -113,12 +113,12 @@ export async function generateFromNotebook(noteIds, count = 5) {
   const topics = selectedNotes.map(n => n.topic).join('、');
   const subject = selectedNotes[0]?.subject || '综合';
 
-  const systemPrompt = `K12出题专家。根据知识点出${count}道选择题。JSON数组：[{"question":"题目","options":["A. xxx","B. xxx","C. xxx","D. xxx"],"answer":"正确选项字母","explanation":"解析","topic":"知识点"}]。只返回JSON。`;
+  const systemPrompt = `K12出题专家。严格根据指定学科和知识点出${count}道选择题。题目内容必须属于指定学科，不要跨学科出题。JSON数组：[{"question":"题目","options":["A. xxx","B. xxx","C. xxx","D. xxx"],"answer":"正确选项字母","explanation":"解析","topic":"知识点"}]。只返回JSON。`;
 
   try {
     const content = await callZhipuAI([
       { role: 'system', content: systemPrompt },
-      { role: 'user', content: `学科：${subject}\n知识点：${topics}` },
+      { role: 'user', content: `学科：${subject}（必须是${subject}学科的题目）\n知识点：${topics}` },
     ]);
     const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     const questions = JSON.parse(jsonStr);

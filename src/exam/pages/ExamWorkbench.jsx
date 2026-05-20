@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { saveExamToLibrary, savePracticePaper } from '../services/storageService.js';
 import { generatePractice } from '../services/ocrService.js';
-import { CACHED_EXAM_RESULTS, EXAM_DOCUMENTS } from '../cachedExams.js';
+import { EXAM_DOCUMENTS } from '../cachedExams.js';
+import { getExamResult } from '../services/storageService.js';
 
 export default function ExamWorkbench({ files, cachedExamId, onBack, onGrade, onStar, onAddMore, isGraded, isSaved, gradeResult, onSavePractice, onSaveBlank }) {
   const [currentPage, setCurrentPage] = useState(0);
@@ -20,7 +21,7 @@ export default function ExamWorkbench({ files, cachedExamId, onBack, onGrade, on
   const [aiAnalyzing, setAiAnalyzing] = useState(true);
   const [visibleLines, setVisibleLines] = useState(0);
 
-  const cachedResult = cachedExamId ? CACHED_EXAM_RESULTS[cachedExamId] : null;
+  const cachedResult = cachedExamId ? getExamResult(cachedExamId) : null;
   const cachedDoc = cachedExamId ? EXAM_DOCUMENTS.find(d => d.id === cachedExamId) : null;
   const displayResult = gradeResult || cachedResult;
 

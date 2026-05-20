@@ -105,21 +105,64 @@ export function extractNotesFromQuestions(questions) {
     const topic = q.topic;
     if (!topic) return;
     const key = `${q.subject || '综合'}_${topic}`;
-    if (noteMap.has(key)) return;
+    if (noteMap.has(key)) {
+      noteMap.get(key)._questions.push(q);
+      return;
+    }
     noteMap.set(key, {
       id: `note_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
       subject: q.subject || '综合',
       topic,
       type: guessNoteType(q),
-      content: `考点：${topic}`,
+      content: '',
       source: 'exam_auto',
       addedAt: new Date().toISOString(),
       reviewCount: 0,
       nextReview: getNextReviewDate(0),
       mastery: 0,
+      _questions: [q],
     });
   });
   return Array.from(noteMap.values());
+}
+
+export async function enrichNotesWithAI(notes) {
+  const { callZhipuAI } = await import('./ocrService.js');
+  const needsEnrich = (n) => !n.content || n.content.startsWith('考点：') || n.content.endsWith('核心概念与应用方法') || n.content.endsWith('的核心概念');
+  const topicGroups = notes.filter(needsEnrich);
+  if (topicGroups.length === 0) return notes;
+
+  const contentMap = new Map();
+  const BATCH_SIZE = 6;
+
+  for (let i = 0; i < topicGroups.length; i += BATCH_SIZE) {
+    const batch = topicGroups.slice(i, i + BATCH_SIZE);
+    const topicList = batch.map(n => {
+      const qs = n._questions || [];
+      const example = qs[0]?.content || '';
+      return `${n.topic}（${n.subject}${example ? '，例：' + example.slice(0, 30) : ''}）`;
+    }).join('；');
+
+    try {
+      const messages = [
+        { role: 'system', content: '为以下K12知识点各写一段总结（40-80字）：定义+要点+易错点。JSON：[{"topic":"名","content":"总结"}]。只返回JSON。' },
+        { role: 'user', content: topicList },
+      ];
+      const response = await callZhipuAI(messages);
+      const jsonStr = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      let parsed = JSON.parse(jsonStr);
+      if (!Array.isArray(parsed)) parsed = [parsed];
+      parsed.forEach(p => contentMap.set(p.topic, p.content));
+    } catch (e) {
+      console.warn('Note enrichment batch failed:', e.message);
+    }
+  }
+
+  return notes.map(n => {
+    const enriched = contentMap.get(n.topic);
+    const { _questions, ...cleanNote } = n;
+    return { ...cleanNote, content: enriched || cleanNote.content || `${n.topic}的核心概念` };
+  });
 }
 
 function guessNoteType(question) {

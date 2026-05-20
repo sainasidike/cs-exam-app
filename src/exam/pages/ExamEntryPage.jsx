@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { EXAM_DOCUMENTS, CACHED_EXAM_RESULTS } from '../cachedExams.js';
-import { getExamLibrary, getWrongQuestions } from '../services/storageService.js';
+import { EXAM_DOCUMENTS } from '../cachedExams.js';
+import { getExamLibrary, getWrongQuestions, getExamResult } from '../services/storageService.js';
 
 const SCENE_COUNT = 3;
 
@@ -28,10 +28,10 @@ export default function ExamEntryPage({ onBack, onScan, onSelectDoc, onDemo, onS
 
   const subjectKeys = Object.keys(subjectCounts);
 
-  const docHasResult = (docId) => !!CACHED_EXAM_RESULTS[docId];
+  const docHasResult = (docId) => !!getExamResult(docId);
 
   const getDocScore = (docId) => {
-    const r = CACHED_EXAM_RESULTS[docId];
+    const r = getExamResult(docId);
     if (!r) return null;
     const qs = r.questions || [];
     const correct = qs.filter(q => q.correct).length;
