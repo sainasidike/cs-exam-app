@@ -1151,16 +1151,31 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
     <div className="cv-page">
       <div className="cv-header">
         {isStarted ? (
-          <button className="cv-back-btn" onClick={handleBackToWelcome}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-          </button>
+          activeTab === 'wrongbook' ? (
+            <button className="cv-back-btn" onClick={() => setActiveTab('chat')}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+          ) : (
+            <button className="cv-back-btn" onClick={handleBackToWelcome}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+          )
         ) : (
           <button className="cv-back-btn" onClick={onBack}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
         )}
-        <div className="cv-header-title">{isStarted && currentExamTitle ? currentExamTitle : '试卷智能助手'}</div>
-        <div style={{width:20}}/>
+        <div className="cv-header-title">
+          {isStarted ? (activeTab === 'wrongbook' ? '本卷错题' : (currentExamTitle || '试卷智能助手')) : '试卷智能助手'}
+        </div>
+        {isStarted && activeTab !== 'wrongbook' && examWrong.length > 0 ? (
+          <button className="cv-header-wrong-btn" onClick={() => setActiveTab('wrongbook')}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            <span className="cv-header-wrong-badge">{examWrong.length}</span>
+          </button>
+        ) : (
+          <div style={{width:20}}/>
+        )}
       </div>
 
       <div className="cv-messages" ref={scrollRef}>
@@ -1181,21 +1196,8 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
         )}
       </div>
 
-      {showInput && activeTab === 'chat' && (
+      {isStarted && activeTab === 'chat' && (
         <InputBar placeholder={inputPlaceholder} onSend={handleSendMessage} />
-      )}
-
-      {isStarted && (
-        <div className="cv-bottom-tabs">
-          <button className={`cv-tab ${activeTab === 'chat' ? 'active' : ''}`} onClick={() => setActiveTab('chat')}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-            <span>对话</span>
-          </button>
-          <button className={`cv-tab ${activeTab === 'wrongbook' ? 'active' : ''}`} onClick={() => setActiveTab('wrongbook')}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-            <span>错题</span>
-          </button>
-        </div>
       )}
     </div>
   );
