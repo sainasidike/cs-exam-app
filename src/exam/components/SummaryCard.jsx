@@ -1,5 +1,5 @@
 export default function SummaryCard({ data }) {
-  const { subject, total, correct, wrong, scorePercent, weakTopics, allTopics, notesAdded, wrongAdded } = data;
+  const { total, correct, wrong, scorePercent, weakTopics, allTopics, wrongQuestions = [] } = data;
 
   return (
     <div className="cv-card cv-summary-card">
@@ -44,6 +44,29 @@ export default function SummaryCard({ data }) {
         </div>
       )}
 
+      {wrongQuestions.length > 0 && (
+        <div className="cv-summary-wrong-list">
+          {wrongQuestions.map((q, i) => (
+            <div key={i} className="cv-summary-wrong-item">
+              <div className="cv-summary-wrong-top">
+                <span className="cv-summary-wrong-num">第{q.number || i + 1}题</span>
+                {q.topic && <span className="cv-summary-wrong-topic">{q.topic}</span>}
+              </div>
+              <p className="cv-summary-wrong-content">{q.content || q.question}</p>
+              <div className="cv-summary-wrong-answers">
+                <div className="cv-summary-wrong-ans wrong">
+                  <span className="cv-summary-wrong-ans-label">你的答案</span>
+                  <span className="cv-summary-wrong-ans-val">{q.userAnswer || '—'}</span>
+                </div>
+                <div className="cv-summary-wrong-ans correct">
+                  <span className="cv-summary-wrong-ans-label">正确答案</span>
+                  <span className="cv-summary-wrong-ans-val">{q.correctAnswer || '—'}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

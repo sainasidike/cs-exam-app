@@ -172,8 +172,7 @@ export function createFlowEngine({ onMessage, onPhaseChange, onComplete }) {
         scorePercent,
         weakTopics,
         allTopics,
-        notesAdded: notes.length,
-        wrongAdded: wrong.length,
+        wrongQuestions: wrong,
       },
       phase: 'summarize',
     });

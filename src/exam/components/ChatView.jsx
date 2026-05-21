@@ -1178,32 +1178,6 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
                     <img className="cv-doc-viewer-img" src={currentExamThumb} alt="试卷" />
                   </div>
                 )}
-                {examWrong.length > 0 && (
-                  <div className="cv-wrong-preview">
-                    <div className="cv-wrong-preview-header">
-                      <span className="cv-wrong-preview-title">错题一览（{examWrong.length}题）</span>
-                      <span className="cv-wrong-preview-hint">左滑查看 →</span>
-                    </div>
-                    <div className="cv-wrong-preview-scroll">
-                      {examWrong.map((q, i) => (
-                        <div key={i} className="cv-wrong-preview-card" onClick={() => {
-                          setActiveTab('chat');
-                          engine.handleUserAction('start_teach');
-                        }}>
-                          <div className="cv-wrong-preview-card-top">
-                            <span className="cv-wrong-preview-num">第{q.number || i+1}题</span>
-                            {q.topic && <span className="cv-wrong-preview-topic">{q.topic}</span>}
-                          </div>
-                          <p className="cv-wrong-preview-content">{q.content || q.question}</p>
-                          <div className="cv-wrong-preview-answers">
-                            <span className="cv-wrong-preview-ans wrong">✗ {q.userAnswer || '—'}</span>
-                            <span className="cv-wrong-preview-ans correct">✓ {q.correctAnswer || '—'}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
                 {messages.map(renderMessage)}
               </>
             )}
