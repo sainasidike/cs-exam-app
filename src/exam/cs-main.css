@@ -1,15 +1,12 @@
 /* === CamScanner Main App - Light Theme === */
 .cs-app {
-  height: 812px;
-  max-height: 100vh;
-  max-height: 100dvh;
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   background: #fff;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', sans-serif;
-  max-width: 375px;
-  margin: 0 auto;
   position: relative;
 }
 .cs-app > .cs-home {

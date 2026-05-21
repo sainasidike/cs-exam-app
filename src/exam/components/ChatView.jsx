@@ -310,7 +310,7 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
             </div>
           </div>
 
-          <div className="cv-empty-divider"><span>或选择应用内文档</span></div>
+          <div className="cv-empty-divider"><span>或选择应用内试卷</span></div>
           <div className="cv-empty-docs">
             {EXAM_DOCUMENTS.map(doc => (
               <button key={doc.id} className="cv-empty-doc" onClick={() => {
@@ -376,7 +376,7 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
 
         <div className="cv-home-tabs">
           <button className={`cv-home-tab ${welcomeTab === 'docs' ? 'active' : ''}`} onClick={() => setWelcomeTab('docs')}>
-            应用内文档
+            应用内试卷
           </button>
           <button className={`cv-home-tab ${welcomeTab === 'graded' ? 'active' : ''}`} onClick={() => setWelcomeTab('graded')}>
             已批改
@@ -985,7 +985,7 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
         )}
-        <div className="cv-header-title">{isStarted && currentExamTitle ? currentExamTitle : 'AI 学习助手'}</div>
+        <div className="cv-header-title">{isStarted && currentExamTitle ? currentExamTitle : '试卷智能助手'}</div>
         <button className="cv-header-lib" onClick={() => onManageExams?.()}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="1.8">
             <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>

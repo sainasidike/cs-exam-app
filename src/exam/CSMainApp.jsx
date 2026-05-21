@@ -78,10 +78,8 @@ export default function CSMainApp() {
       if (quickGradeMode) {
         setQuickGradeMode(false);
         setExamFlow(true);
-        setRoute('ai-assistant');
-      } else {
-        setRoute('cs-edit');
       }
+      setRoute('cs-edit');
     }
     e.target.value = '';
   };
@@ -98,7 +96,11 @@ export default function CSMainApp() {
 
   const handleEditBack = () => {
     setCapturedFiles([]);
-    if (examFlow) {
+    if (examReturnRoute) {
+      const ret = examReturnRoute;
+      setExamReturnRoute(null);
+      setRoute(ret);
+    } else if (examFlow) {
       setRoute('exam-entry');
     } else {
       setRoute('tabs');
@@ -296,7 +298,7 @@ export default function CSMainApp() {
           onToolSelect={handleToolSelect}
           onExamAssistant={() => {
             setExamFlow(true);
-            setRoute('exam-workbench');
+            setRoute('ai-assistant');
           }}
         />
       </>
@@ -393,11 +395,13 @@ export default function CSMainApp() {
           onScan={() => {
             setExamFlow(true);
             setQuickGradeMode(true);
+            setExamReturnRoute('ai-assistant');
             document.getElementById('cs-album-input')?.click();
           }}
           onCamera={() => {
             setExamFlow(true);
             setQuickGradeMode(true);
+            setExamReturnRoute('ai-assistant');
             document.getElementById('cs-camera-input')?.click();
           }}
           onPickDoc={() => {
