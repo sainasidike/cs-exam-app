@@ -416,7 +416,11 @@ export default function CSMainApp() {
           }}
           onTabChange={(tab) => {
             if (tab === 'all-notebook') setRoute('ai-notebook');
-            else if (tab === 'all-wrongbook' || tab === 'wrongbook-redo' || tab === 'wrongbook-export' || tab === 'wrongbook-review') {
+            else if (tab === 'wrongbook-redo') {
+              setExamReturnRoute('ai-assistant');
+              setExamInitialStep('redo');
+              setRoute('exam-app');
+            } else if (tab === 'all-wrongbook' || tab === 'wrongbook-export' || tab === 'wrongbook-review') {
               setExamReturnRoute('ai-assistant');
               setExamInitialStep('wrongbook');
               setRoute('exam-app');

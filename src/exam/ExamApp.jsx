@@ -77,6 +77,15 @@ export default function ExamApp({ initialFiles = [], onExit, onLibrary, cachedRe
         setIsGeneratingQuiz(false);
       });
     }
+    if (initialStep === 'redo' && !autoReviewTriggered && wrongQuestions.length > 0) {
+      setAutoReviewTriggered(true);
+      setRedoQuestions(wrongQuestions);
+      setRedoIndex(0);
+      setRedoRevealed(false);
+      setRedoSelected(null);
+      setRedoResults([]);
+      setCsStep('redo');
+    }
   }, [initialStep, wrongQuestions, autoReviewTriggered]);
 
   useEffect(() => {
