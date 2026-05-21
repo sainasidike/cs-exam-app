@@ -1160,12 +1160,7 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
           </button>
         )}
         <div className="cv-header-title">{isStarted && currentExamTitle ? currentExamTitle : '试卷智能助手'}</div>
-        <button className="cv-header-lib" onClick={() => onManageExams?.()}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="1.8">
-            <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
-          </svg>
-        </button>
+        <div style={{width:20}}/>
       </div>
 
       <div className="cv-messages" ref={scrollRef}>
