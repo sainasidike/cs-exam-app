@@ -854,12 +854,6 @@ export default function CSMainApp() {
                   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" strokeWidth="1"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg>
                 </div>
               </div>
-              <div className="cs-tool-card-lg" onClick={() => setRoute('teacher-home')}>
-                <span className="cs-tool-card-title">教师工作台</span>
-                <div className="cs-tool-card-img">
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9C27B0" strokeWidth="1"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-                </div>
-              </div>
             </div>
           </div>
 
