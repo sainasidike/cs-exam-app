@@ -432,13 +432,6 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
 
     return (
       <div className="cv-home">
-        <div className="cv-home-scan">
-          <button className="cv-home-scan-btn" onClick={() => onCamera?.()}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-            扫描试卷批改
-          </button>
-        </div>
-
         {reminder && (
           <div className="cv-home-bubble-wrap">
             <div className="cv-home-bubble-avatar">AI</div>
@@ -478,6 +471,13 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
           {reviewPlan.length > 0 && reviewPlan[0].subtitle && (
             <div className="cv-review-subtitle">{reviewPlan[0].subtitle}</div>
           )}
+        </div>
+
+        <div className="cv-home-scan">
+          <button className="cv-home-scan-btn" onClick={() => onCamera?.()}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            扫描试卷批改
+          </button>
         </div>
 
         <div className="cv-home-tabs">
