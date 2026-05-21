@@ -24,16 +24,16 @@ export default function SummaryCard({ data }) {
             <span className="cv-stat-label">错误</span>
             <span className="cv-stat-value cv-stat-wrong">{wrong}题</span>
           </div>
-          {allTopics && allTopics.length > 0 && (
-            <div className="cv-stat-row">
-              <span className="cv-stat-label">考点</span>
-              <span className="cv-stat-value">
-                {allTopics.length > 3 ? allTopics.slice(0, 3).join('、') + '等' : allTopics.join('、')}
-              </span>
-            </div>
-          )}
         </div>
       </div>
+      {allTopics && allTopics.length > 0 && (
+        <div className="cv-summary-topics-inline">
+          <span className="cv-topics-label-inline">考点覆盖：</span>
+          <span className="cv-topics-text-inline">
+            {allTopics.length > 5 ? allTopics.slice(0, 5).join('、') + '等' : allTopics.join('、')}
+          </span>
+        </div>
+      )}
 
       {wrongQuestions.length > 0 && (() => {
         const q = wrongQuestions[wrongIdx];

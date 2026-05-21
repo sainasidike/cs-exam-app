@@ -1653,6 +1653,20 @@
 
 .cv-topics-text { color: #333; }
 
+.cv-summary-topics-inline {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.cv-topics-label-inline {
+  color: #666;
+}
+
+.cv-topics-text-inline {
+  color: #333;
+}
+
 .cv-summary-actions-row {
   display: flex;
   flex-wrap: wrap;
