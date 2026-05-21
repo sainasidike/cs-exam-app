@@ -367,6 +367,9 @@
 }
 
 .cv-home-bubble-btn.scan {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   background: linear-gradient(135deg, #43A047, #66BB6A);
   color: #fff;
   border: none;
