@@ -96,14 +96,51 @@
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 
-/* === Wrong Questions List in SummaryCard === */
-.cv-summary-wrong-list {
+/* === Wrong Questions Carousel in SummaryCard === */
+.cv-summary-wrong-carousel {
   margin-top: 12px;
   border-top: 1px solid #f0f0f0;
   padding-top: 10px;
+}
+
+.cv-summary-wrong-nav {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.cv-summary-wrong-indicator {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+}
+
+.cv-summary-wrong-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.cv-summary-wrong-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.cv-summary-wrong-btn:active {
+  background: #f5f5f5;
+}
+
+.cv-summary-wrong-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
 }
 
 .cv-summary-wrong-item {

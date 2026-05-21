@@ -1,5 +1,8 @@
+import { useState } from 'react';
+
 export default function SummaryCard({ data }) {
   const { total, correct, wrong, scorePercent, weakTopics, allTopics, wrongQuestions = [] } = data;
+  const [wrongIdx, setWrongIdx] = useState(0);
 
   return (
     <div className="cv-card cv-summary-card">
@@ -44,12 +47,32 @@ export default function SummaryCard({ data }) {
         </div>
       )}
 
-      {wrongQuestions.length > 0 && (
-        <div className="cv-summary-wrong-list">
-          {wrongQuestions.map((q, i) => (
-            <div key={i} className="cv-summary-wrong-item">
+      {wrongQuestions.length > 0 && (() => {
+        const q = wrongQuestions[wrongIdx];
+        return (
+          <div className="cv-summary-wrong-carousel">
+            <div className="cv-summary-wrong-nav">
+              <span className="cv-summary-wrong-indicator">错题 {wrongIdx + 1}/{wrongQuestions.length}</span>
+              <div className="cv-summary-wrong-btns">
+                <button
+                  className="cv-summary-wrong-btn"
+                  disabled={wrongIdx === 0}
+                  onClick={() => setWrongIdx(wrongIdx - 1)}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <button
+                  className="cv-summary-wrong-btn"
+                  disabled={wrongIdx === wrongQuestions.length - 1}
+                  onClick={() => setWrongIdx(wrongIdx + 1)}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+            </div>
+            <div className="cv-summary-wrong-item">
               <div className="cv-summary-wrong-top">
-                <span className="cv-summary-wrong-num">第{q.number || i + 1}题</span>
+                <span className="cv-summary-wrong-num">第{q.number || wrongIdx + 1}题</span>
                 {q.topic && <span className="cv-summary-wrong-topic">{q.topic}</span>}
               </div>
               <p className="cv-summary-wrong-content">{q.content || q.question}</p>
@@ -64,9 +87,9 @@ export default function SummaryCard({ data }) {
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        );
+      })()}
     </div>
   );
 }
