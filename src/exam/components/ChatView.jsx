@@ -486,7 +486,7 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
               </div>
               {item.type === 'weekly' && item.subtitle && (
                 <div className="cv-review-subtitle" onClick={() => onTabChange?.('wrongbook-redo')}>
-                  {item.subtitle}
+                  {item.subtitle} &gt;
                 </div>
               )}
             </div>
