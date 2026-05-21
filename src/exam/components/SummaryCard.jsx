@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 export default function SummaryCard({ data }) {
-  const { total, correct, wrong, scorePercent, weakTopics, allTopics, wrongQuestions = [] } = data;
+  const { total, correct, wrong, scorePercent, allTopics, wrongQuestions = [] } = data;
   const [wrongIdx, setWrongIdx] = useState(0);
 
   return (
@@ -24,28 +24,16 @@ export default function SummaryCard({ data }) {
             <span className="cv-stat-label">错误</span>
             <span className="cv-stat-value cv-stat-wrong">{wrong}题</span>
           </div>
+          {allTopics && allTopics.length > 0 && (
+            <div className="cv-stat-row">
+              <span className="cv-stat-label">考点</span>
+              <span className="cv-stat-value">
+                {allTopics.length > 3 ? allTopics.slice(0, 3).join('、') + '等' : allTopics.join('、')}
+              </span>
+            </div>
+          )}
         </div>
       </div>
-
-      {weakTopics.length > 0 && (
-        <div className="cv-summary-weak">
-          <span className="cv-weak-label">🔴 薄弱知识点</span>
-          <div className="cv-weak-list">
-            {weakTopics.map(([topic, count]) => (
-              <span key={topic} className="cv-weak-chip">{topic}({count}题)</span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {allTopics && allTopics.length > 0 && (
-        <div className="cv-summary-topics">
-          <span className="cv-topics-label">考点覆盖</span>
-          <span className="cv-topics-text">
-            {allTopics.length > 5 ? allTopics.slice(0, 5).join('、') + '等' : allTopics.join('、')}
-          </span>
-        </div>
-      )}
 
       {wrongQuestions.length > 0 && (() => {
         const q = wrongQuestions[wrongIdx];
