@@ -357,30 +357,17 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
           </div>
         )}
 
-        <div className="cv-home-global">
-          <button className="cv-home-global-item" onClick={() => onTabChange?.('all-notebook')}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#43A047" strokeWidth="1.8"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-            <span>全部笔记</span>
-            <span className="cv-home-global-count">{notebookStats.total}</span>
-          </button>
-          <button className="cv-home-global-item" onClick={() => onTabChange?.('all-wrongbook')}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F44336" strokeWidth="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-            <span>全部错题</span>
-            <span className="cv-home-global-count">{wrongCount}</span>
-          </button>
-          <button className="cv-home-global-item" onClick={() => onTabChange?.('all-report')}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF9800" strokeWidth="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            <span>学习报告</span>
-          </button>
-        </div>
-
         <div className="cv-home-tabs">
           <button className={`cv-home-tab ${welcomeTab === 'docs' ? 'active' : ''}`} onClick={() => setWelcomeTab('docs')}>
             应用内试卷
           </button>
           <button className={`cv-home-tab ${welcomeTab === 'graded' ? 'active' : ''}`} onClick={() => setWelcomeTab('graded')}>
             已批改
-            <span className="cv-home-tab-badge">{studiedExams.length}</span>
+            {studiedExams.length > 0 && <span className="cv-home-tab-badge">{studiedExams.length}</span>}
+          </button>
+          <button className={`cv-home-tab ${welcomeTab === 'wrong' ? 'active' : ''}`} onClick={() => setWelcomeTab('wrong')}>
+            全部错题
+            {wrongCount > 0 && <span className="cv-home-tab-badge">{wrongCount}</span>}
           </button>
         </div>
 
@@ -411,6 +398,9 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
 
           {welcomeTab === 'graded' && (
             <div className="cv-home-graded">
+              {studiedExams.length === 0 && (
+                <div className="cv-home-empty">还没有批改过试卷</div>
+              )}
               {studiedExams.map(exam => (
                 <button key={exam.id} className="cv-home-doc-item" onClick={() => startStudiedExam(exam)}>
                   {exam.thumb && <img className="cv-home-doc-img" src={exam.thumb} alt="" />}
@@ -425,6 +415,42 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
                   </div>
                 </button>
               ))}
+            </div>
+          )}
+
+          {welcomeTab === 'wrong' && (
+            <div className="cv-home-wrong">
+              {(() => {
+                const allWrong = getWrongQuestions();
+                if (allWrong.length === 0) return <div className="cv-home-empty">暂无错题记录</div>;
+                const grouped = {};
+                allWrong.forEach(q => {
+                  const key = q.subject || q.topic || '未分类';
+                  if (!grouped[key]) grouped[key] = [];
+                  grouped[key].push(q);
+                });
+                return Object.entries(grouped).map(([subject, questions]) => (
+                  <div key={subject} className="cv-home-wrong-group">
+                    <div className="cv-home-wrong-header">
+                      <span className="cv-home-wrong-subject">{subject}</span>
+                      <span className="cv-home-wrong-count">{questions.length}题</span>
+                    </div>
+                    {questions.slice(0, 5).map((q, i) => (
+                      <div key={i} className="cv-home-wrong-item">
+                        <span className="cv-home-wrong-num">{q.number || i + 1}</span>
+                        <div className="cv-home-wrong-content">
+                          <span className="cv-home-wrong-text">{q.content}</span>
+                          <span className="cv-home-wrong-answer">你的答案: {q.userAnswer} → 正确: {q.correctAnswer}</span>
+                        </div>
+                        <span className="cv-home-wrong-topic">{q.topic}</span>
+                      </div>
+                    ))}
+                    {questions.length > 5 && (
+                      <div className="cv-home-wrong-more">还有 {questions.length - 5} 题...</div>
+                    )}
+                  </div>
+                ));
+              })()}
             </div>
           )}
         </div>
