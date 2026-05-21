@@ -398,6 +398,11 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
 
           {welcomeTab === 'graded' && (
             <div className="cv-home-graded">
+              <button className="cv-home-entry-link" onClick={() => onManageExams?.()}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                我的试卷库
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
               {studiedExams.length === 0 && (
                 <div className="cv-home-empty">还没有批改过试卷</div>
               )}
@@ -415,16 +420,16 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
                   </div>
                 </button>
               ))}
-              <button className="cv-home-entry-link" onClick={() => onManageExams?.()}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-                我的试卷库
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
-              </button>
             </div>
           )}
 
           {welcomeTab === 'wrong' && (
             <div className="cv-home-wrong">
+              <button className="cv-home-entry-link" onClick={() => onTabChange?.('all-wrongbook')}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                我的错题库
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
               {(() => {
                 const allWrong = getWrongQuestions();
                 if (allWrong.length === 0) return <div className="cv-home-empty">暂无错题记录</div>;
@@ -456,11 +461,6 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
                   </div>
                 ));
               })()}
-              <button className="cv-home-entry-link" onClick={() => onTabChange?.('all-wrongbook')}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-                全部错题
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
-              </button>
             </div>
           )}
         </div>
