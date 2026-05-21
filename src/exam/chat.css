@@ -367,9 +367,13 @@
 }
 
 .cv-home-bubble-btn.scan {
-  background: #fff;
-  color: #666;
-  border-color: #ddd;
+  background: linear-gradient(135deg, #43A047, #66BB6A);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  font-size: 13px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(76,175,80,0.3);
 }
 
 .cv-home-bubble-btn:active {
@@ -378,7 +382,8 @@
 }
 
 .cv-home-bubble-btn.scan:active {
-  background: #f5f5f5;
+  background: linear-gradient(135deg, #388E3C, #43A047);
+  transform: scale(0.96);
 }
 
 .cv-home-demo-btn {
