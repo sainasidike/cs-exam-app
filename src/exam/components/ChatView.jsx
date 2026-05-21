@@ -1178,12 +1178,36 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
                     <img className="cv-doc-viewer-img" src={currentExamThumb} alt="试卷" />
                   </div>
                 )}
+                {examWrong.length > 0 && (
+                  <div className="cv-wrong-preview">
+                    <div className="cv-wrong-preview-header">
+                      <span className="cv-wrong-preview-title">错题一览（{examWrong.length}题）</span>
+                      <span className="cv-wrong-preview-hint">左滑查看 →</span>
+                    </div>
+                    <div className="cv-wrong-preview-scroll">
+                      {examWrong.map((q, i) => (
+                        <div key={i} className="cv-wrong-preview-card" onClick={() => {
+                          setActiveTab('chat');
+                          engine.handleUserAction('start_teach');
+                        }}>
+                          <div className="cv-wrong-preview-card-top">
+                            <span className="cv-wrong-preview-num">第{q.number || i+1}题</span>
+                            {q.topic && <span className="cv-wrong-preview-topic">{q.topic}</span>}
+                          </div>
+                          <p className="cv-wrong-preview-content">{q.content || q.question}</p>
+                          <div className="cv-wrong-preview-answers">
+                            <span className="cv-wrong-preview-ans wrong">✗ {q.userAnswer || '—'}</span>
+                            <span className="cv-wrong-preview-ans correct">✓ {q.correctAnswer || '—'}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {messages.map(renderMessage)}
               </>
             )}
-            {activeTab === 'notebook' && renderExamNotes()}
             {activeTab === 'wrongbook' && renderExamWrong()}
-            {activeTab === 'report' && renderExamReport()}
           </>
         )}
       </div>
@@ -1198,17 +1222,9 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
             <span>对话</span>
           </button>
-          <button className={`cv-tab ${activeTab === 'notebook' ? 'active' : ''}`} onClick={() => setActiveTab('notebook')}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-            <span>笔记</span>
-          </button>
           <button className={`cv-tab ${activeTab === 'wrongbook' ? 'active' : ''}`} onClick={() => setActiveTab('wrongbook')}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
             <span>错题</span>
-          </button>
-          <button className={`cv-tab ${activeTab === 'report' ? 'active' : ''}`} onClick={() => setActiveTab('report')}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            <span>报告</span>
           </button>
         </div>
       )}

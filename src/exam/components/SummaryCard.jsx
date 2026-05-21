@@ -44,10 +44,6 @@ export default function SummaryCard({ data }) {
         </div>
       )}
 
-      <div className="cv-summary-actions-row">
-        {notesAdded > 0 && <span className="cv-action-chip">📒 已记录{notesAdded}个知识点</span>}
-        {wrongAdded > 0 && <span className="cv-action-chip">📕 已存入{wrongAdded}道错题</span>}
-      </div>
     </div>
   );
 }
