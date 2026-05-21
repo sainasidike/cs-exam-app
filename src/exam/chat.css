@@ -363,10 +363,7 @@
   padding: 10px 14px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
   border: 1px solid rgba(0,0,0,0.04);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
+  position: relative;
 }
 
 .cv-home-bubble-text {
@@ -374,9 +371,13 @@
   font-size: 13px;
   line-height: 1.5;
   color: #333;
+  padding-right: 90px;
 }
 
 .cv-home-bubble-btn {
+  position: absolute;
+  right: 14px;
+  bottom: 10px;
   display: inline-block;
   padding: 5px 12px;
   background: #E8F5E9;
@@ -387,6 +388,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s, transform 0.1s;
+  white-space: nowrap;
 }
 
 .cv-home-bubble-btn:active {
