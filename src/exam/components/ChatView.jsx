@@ -442,7 +442,7 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
                   {reminder.cta} →
                 </button>
                 <button className="cv-home-bubble-btn scan" onClick={() => onCamera?.()}>
-                  扫描试卷 →
+                  扫描新试卷 →
                 </button>
               </div>
             </div>
@@ -454,7 +454,7 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
               <p className="cv-home-bubble-text">拍照上传试卷，30秒出批改结果！</p>
               <div className="cv-home-bubble-actions">
                 <button className="cv-home-bubble-btn" onClick={() => onCamera?.()}>
-                  扫描试卷 →
+                  扫描新试卷 →
                 </button>
               </div>
             </div>
