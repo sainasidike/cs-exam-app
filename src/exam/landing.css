@@ -1,11 +1,13 @@
-/* === Landing Page - 参考医疗报告风格 === */
+/* === Landing Page - 全屏展示 === */
 .landing-page {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
   font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
   color: #1a2b3c;
   background: #f7f8fa;
   line-height: 1.7;
-  max-width: 100%;
-  margin: 0 auto;
+  overflow-y: auto;
   opacity: 0;
   transform: translateY(8px);
   transition: opacity 0.4s ease, transform 0.4s ease;
