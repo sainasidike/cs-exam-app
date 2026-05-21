@@ -257,7 +257,7 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
       if (teachCount < wrongCount) {
         const remaining = wrongCount - teachCount;
         return {
-          text: `「${examTitle}」还有 ${remaining} 道错题没讲解完，要继续吗？`,
+          text: `「${examTitle}」还有 ${remaining} 道错题没讲解完，要继续吗？还是扫描新试卷开始批改？`,
           cta: '继续讲解',
           exam: { id: latest.id, title: examTitle, thumb: doc?.thumb || null },
         };
@@ -432,14 +432,31 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
 
     return (
       <div className="cv-home">
-        {reminder && (
+        {reminder ? (
           <div className="cv-home-bubble-wrap">
             <div className="cv-home-bubble-avatar">AI</div>
             <div className="cv-home-bubble">
               <p className="cv-home-bubble-text">{reminder.text}</p>
-              <button className="cv-home-bubble-btn" onClick={() => startStudiedExam(reminder.exam)}>
-                {reminder.cta} →
-              </button>
+              <div className="cv-home-bubble-actions">
+                <button className="cv-home-bubble-btn" onClick={() => startStudiedExam(reminder.exam)}>
+                  {reminder.cta} →
+                </button>
+                <button className="cv-home-bubble-btn scan" onClick={() => onCamera?.()}>
+                  扫描试卷 →
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="cv-home-bubble-wrap">
+            <div className="cv-home-bubble-avatar">AI</div>
+            <div className="cv-home-bubble">
+              <p className="cv-home-bubble-text">拍照上传试卷，30秒出批改结果！</p>
+              <div className="cv-home-bubble-actions">
+                <button className="cv-home-bubble-btn" onClick={() => onCamera?.()}>
+                  扫描试卷 →
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -476,12 +493,6 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
           ))}
         </div>
 
-        <div className="cv-home-scan">
-          <button className="cv-home-scan-btn" onClick={() => onCamera?.()}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-            扫描试卷批改
-          </button>
-        </div>
 
         <div className="cv-home-tabs">
           <button className={`cv-home-tab ${welcomeTab === 'docs' ? 'active' : ''}`} onClick={() => setWelcomeTab('docs')}>

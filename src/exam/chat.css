@@ -309,31 +309,6 @@
 }
 
 /* Scan Section */
-.cv-home-scan {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.cv-home-scan-btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: linear-gradient(135deg, #43A047, #66BB6A);
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 3px 12px rgba(76,175,80,0.25);
-  transition: transform 0.15s;
-}
-
-.cv-home-scan-btn:active { transform: scale(0.97); }
 
 .cv-home-bubble-wrap {
   display: flex;
@@ -372,6 +347,11 @@
   color: #333;
 }
 
+.cv-home-bubble-actions {
+  display: flex;
+  gap: 8px;
+}
+
 .cv-home-bubble-btn {
   display: inline-block;
   padding: 6px 14px;
@@ -386,9 +366,19 @@
   white-space: nowrap;
 }
 
+.cv-home-bubble-btn.scan {
+  background: #fff;
+  color: #666;
+  border-color: #ddd;
+}
+
 .cv-home-bubble-btn:active {
   background: #C8E6C9;
   transform: scale(0.96);
+}
+
+.cv-home-bubble-btn.scan:active {
+  background: #f5f5f5;
 }
 
 .cv-home-demo-btn {
