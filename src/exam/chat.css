@@ -303,9 +303,9 @@
 .cv-home {
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding: 12px 16px;
   overflow-y: auto;
-  gap: 16px;
+  gap: 10px;
 }
 
 /* Scan Section */
@@ -339,7 +339,6 @@
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  margin: 0 16px 14px;
 }
 
 .cv-home-bubble-avatar {
@@ -726,7 +725,6 @@
 
 /* Review Plan Card */
 .cv-review-plan {
-  margin: 0 16px 12px;
   background: #fafffe;
   border: 1px solid #e8f5e9;
   border-radius: 12px;
