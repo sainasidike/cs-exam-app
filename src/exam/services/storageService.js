@@ -251,3 +251,28 @@ export function getPracticePaper(id) {
 export function clearAllData() {
   Object.values(KEYS).forEach(key => localStorage.removeItem(key));
 }
+
+// === Review Schedule ===
+const REVIEW_KEY = 'cs_review_schedule';
+
+export function getReviewSchedule() {
+  try {
+    return JSON.parse(localStorage.getItem(REVIEW_KEY)) || {};
+  } catch { return {}; }
+}
+
+export function saveReviewSchedule(schedule) {
+  localStorage.setItem(REVIEW_KEY, JSON.stringify(schedule));
+}
+
+export function markReviewDone(type, score) {
+  const schedule = getReviewSchedule();
+  if (!schedule.history) schedule.history = [];
+  schedule.history.unshift({
+    type,
+    date: new Date().toISOString().split('T')[0],
+    score,
+  });
+  if (schedule.history.length > 20) schedule.history = schedule.history.slice(0, 20);
+  saveReviewSchedule(schedule);
+}

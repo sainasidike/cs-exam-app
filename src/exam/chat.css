@@ -720,6 +720,87 @@
 }
 .cv-home-entry-link:active { background: #e8f5e9; }
 
+/* Review Plan Card */
+.cv-review-plan {
+  margin: 0 16px 12px;
+  background: #fafffe;
+  border: 1px solid #e8f5e9;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+.cv-review-plan-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 8px;
+}
+.cv-review-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 0;
+  cursor: default;
+  font-size: 13px;
+  color: #555;
+}
+.cv-review-item.active {
+  color: #1a1a1a;
+  font-weight: 600;
+  cursor: pointer;
+}
+.cv-review-item.done {
+  color: #bbb;
+}
+.cv-review-item-dot {
+  font-size: 12px;
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.cv-review-item.active .cv-review-item-dot { color: #43A047; }
+.cv-review-item.done .cv-review-item-dot { color: #bbb; }
+.cv-review-item-label {
+  flex-shrink: 0;
+}
+.cv-review-item-date {
+  color: #999;
+  font-size: 12px;
+}
+.cv-review-item-days {
+  margin-left: auto;
+  font-size: 11px;
+  color: #999;
+  background: #f5f5f5;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.cv-review-item.active .cv-review-item-days {
+  background: #E8F5E9;
+  color: #43A047;
+  font-weight: 700;
+}
+.cv-review-item.done .cv-review-item-days {
+  background: none;
+  color: #bbb;
+}
+.cv-review-item-go {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: #43A047;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-left: 4px;
+}
+.cv-review-subtitle {
+  font-size: 11px;
+  color: #999;
+  padding: 2px 0 0 22px;
+}
+
 /* Scoped views (inside exam) */
 .cv-scoped-empty {
   text-align: center;

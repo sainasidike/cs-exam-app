@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { createFlowEngine } from '../services/flowEngine.js';
 import { EXAM_DOCUMENTS, EXAM_GRADABLE } from '../cachedExams.js';
 import { DEMO_EXAM } from '../demoData.js';
-import { getWrongQuestions, getExamLibrary, getExamResult, getExamMessages, getExamNotes, getExamWrong, savePracticePaper } from '../services/storageService.js';
+import { getWrongQuestions, getExamLibrary, getExamResult, getExamMessages, getExamNotes, getExamWrong, savePracticePaper, getReviewSchedule, markReviewDone } from '../services/storageService.js';
 import { generateReviewQuiz, callZhipuAI } from '../services/ocrService.js';
 import { getNotebook, getNotebookStats } from '../services/notebookService.js';
 import MessageBubble from './MessageBubble.jsx';
@@ -285,6 +285,100 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
 
     const reminder = computeReminder();
 
+    const computeReviewPlan = () => {
+      const today = new Date();
+      const dayOfWeek = today.getDay();
+      const allWrong = getWrongQuestions();
+      const schedule = getReviewSchedule();
+      const history = schedule.history || [];
+
+      const getNextSaturday = () => {
+        const d = new Date(today);
+        const daysUntil = (6 - dayOfWeek + 7) % 7 || 7;
+        d.setDate(d.getDate() + (dayOfWeek === 6 ? 0 : daysUntil));
+        return d;
+      };
+
+      const getMonthEnd = () => {
+        const d = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        return d;
+      };
+
+      const getSemesterEnd = () => {
+        const month = today.getMonth();
+        if (month >= 1 && month <= 6) return new Date(today.getFullYear(), 5, 20);
+        return new Date(today.getFullYear() + 1, 0, 10);
+      };
+
+      const diffDays = (target) => Math.max(0, Math.ceil((target - today) / 86400000));
+
+      const weekWrong = allWrong.filter(q => {
+        if (!q.addedAt) return false;
+        const added = new Date(q.addedAt);
+        const weekStart = new Date(today);
+        weekStart.setDate(weekStart.getDate() - dayOfWeek);
+        weekStart.setHours(0, 0, 0, 0);
+        return added >= weekStart;
+      });
+
+      const lastWeekReview = history.find(h => h.type === 'weekly');
+      const lastMonthReview = history.find(h => h.type === 'monthly');
+
+      const satDate = getNextSaturday();
+      const monthEnd = getMonthEnd();
+      const semEnd = getSemesterEnd();
+
+      const items = [];
+
+      const isToday = (d) => d.toDateString() === today.toDateString();
+
+      items.push({
+        type: 'weekly',
+        label: '周复习',
+        date: `${satDate.getMonth() + 1}/${satDate.getDate()}`,
+        daysLeft: dayOfWeek === 6 ? 0 : diffDays(satDate),
+        isActive: dayOfWeek === 6,
+        subtitle: weekWrong.length > 0 ? `本周新增 ${weekWrong.length} 道错题待巩固` : '本周暂无新错题',
+        count: weekWrong.length,
+      });
+
+      items.push({
+        type: 'monthly',
+        label: '月度测验',
+        date: `${monthEnd.getMonth() + 1}/${monthEnd.getDate()}`,
+        daysLeft: diffDays(monthEnd),
+        isActive: isToday(monthEnd),
+        subtitle: `覆盖本月全部薄弱知识点`,
+        count: allWrong.length,
+      });
+
+      items.push({
+        type: 'semester',
+        label: '期末复习',
+        date: `${semEnd.getMonth() + 1}/${semEnd.getDate()}`,
+        daysLeft: diffDays(semEnd),
+        isActive: isToday(semEnd),
+        subtitle: `综合测验 + 错题重做`,
+        count: allWrong.length,
+      });
+
+      if (lastWeekReview) {
+        items.push({
+          type: 'done',
+          label: '上周复习',
+          date: lastWeekReview.date?.slice(5).replace('-', '/'),
+          daysLeft: -1,
+          isActive: false,
+          subtitle: lastWeekReview.score != null ? `得分 ${lastWeekReview.score}%` : '已完成',
+          count: 0,
+        });
+      }
+
+      return items;
+    };
+
+    const reviewPlan = computeReviewPlan();
+
     if (!hasStudied) {
       return (
         <div className="cv-empty">
@@ -356,6 +450,35 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
             </div>
           </div>
         )}
+
+        <div className="cv-review-plan">
+          <div className="cv-review-plan-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#43A047" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span>学习计划</span>
+          </div>
+          {reviewPlan.map((item, idx) => (
+            <div
+              key={item.type}
+              className={`cv-review-item ${item.isActive ? 'active' : ''} ${item.type === 'done' ? 'done' : ''}`}
+              onClick={() => {
+                if (item.isActive && item.count > 0) {
+                  onTabChange?.('all-wrongbook');
+                }
+              }}
+            >
+              <span className="cv-review-item-dot">{item.type === 'done' ? '✓' : '○'}</span>
+              <span className="cv-review-item-label">{item.label}</span>
+              <span className="cv-review-item-date">{item.date}</span>
+              <span className="cv-review-item-days">
+                {item.type === 'done' ? '完成' : item.daysLeft === 0 ? '今天' : `${item.daysLeft}天后`}
+              </span>
+              {item.isActive && item.count > 0 && <span className="cv-review-item-go">开始</span>}
+            </div>
+          ))}
+          {reviewPlan.length > 0 && reviewPlan[0].subtitle && (
+            <div className="cv-review-subtitle">{reviewPlan[0].subtitle}</div>
+          )}
+        </div>
 
         <div className="cv-home-tabs">
           <button className={`cv-home-tab ${welcomeTab === 'docs' ? 'active' : ''}`} onClick={() => setWelcomeTab('docs')}>
