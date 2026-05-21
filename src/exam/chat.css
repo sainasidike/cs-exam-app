@@ -700,6 +700,26 @@
   padding: 8px 0;
 }
 
+/* Entry link button */
+.cv-home-entry-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  background: #f8faf8;
+  border: 1px solid #e8f5e9;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #43A047;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cv-home-entry-link:active { background: #e8f5e9; }
+
 /* Scoped views (inside exam) */
 .cv-scoped-empty {
   text-align: center;
