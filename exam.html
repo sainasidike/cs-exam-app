@@ -15,14 +15,13 @@
     }
     .iphone-frame {
       position: relative;
-      width: 393px;
-      height: 852px;
+      width: 383px;
+      height: 842px;
       background: #1c1c1e;
-      border-radius: 54px;
-      padding: 10px;
+      border-radius: 52px;
+      padding: 5px;
       box-shadow:
-        0 0 0 1.5px #4a4a4e,
-        0 0 0 3px #2c2c2e,
+        0 0 0 1px #4a4a4e,
         0 30px 80px rgba(0,0,0,0.35),
         0 10px 30px rgba(0,0,0,0.2);
     }
@@ -30,23 +29,23 @@
     .iphone-frame::before {
       content: '';
       position: absolute;
-      top: 16px;
+      top: 12px;
       left: 50%;
       transform: translateX(-50%);
-      width: 126px;
-      height: 34px;
+      width: 120px;
+      height: 32px;
       background: #000;
-      border-radius: 20px;
+      border-radius: 18px;
       z-index: 9999;
     }
     /* Home Indicator */
     .iphone-frame::after {
       content: '';
       position: absolute;
-      bottom: 18px;
+      bottom: 14px;
       left: 50%;
       transform: translateX(-50%);
-      width: 134px;
+      width: 130px;
       height: 5px;
       background: #000;
       border-radius: 3px;
@@ -93,7 +92,7 @@
     .iphone-screen {
       width: 100%;
       height: 100%;
-      border-radius: 44px;
+      border-radius: 47px;
       overflow: hidden;
       background: #fff;
       position: relative;
@@ -122,6 +121,9 @@
       width: 100%;
       height: 100%;
     }
+    /* Hide scrollbar */
+    .iphone-screen *::-webkit-scrollbar { display: none; }
+    .iphone-screen * { scrollbar-width: none; }
 
     @media (max-width: 500px) {
       html, body { background: #fff; }
