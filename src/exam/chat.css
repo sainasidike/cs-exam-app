@@ -360,26 +360,21 @@
   min-width: 0;
   background: #fff;
   border-radius: 2px 14px 14px 14px;
-  padding: 10px 14px;
+  padding: 12px 14px 14px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
   border: 1px solid rgba(0,0,0,0.04);
-  position: relative;
 }
 
 .cv-home-bubble-text {
-  margin: 0;
+  margin: 0 0 10px;
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.6;
   color: #333;
-  padding-right: 90px;
 }
 
 .cv-home-bubble-btn {
-  position: absolute;
-  right: 14px;
-  bottom: 10px;
   display: inline-block;
-  padding: 5px 12px;
+  padding: 6px 14px;
   background: #E8F5E9;
   color: #2E7D32;
   border: 1px solid rgba(67, 160, 71, 0.2);
