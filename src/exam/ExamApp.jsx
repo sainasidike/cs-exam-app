@@ -388,7 +388,11 @@ export default function ExamApp({ initialFiles = [], onExit, onLibrary, cachedRe
       setWrongQuestions(updated);
       saveWrongQuestions(updated);
     }
-    setCsStep('wrongbook');
+    if (enteredViaFeature && initialStep === 'redo' && onExit) {
+      onExit();
+    } else {
+      setCsStep('wrongbook');
+    }
   };
 
   const handleExportWrongBook = (withAnswer) => {
@@ -1573,7 +1577,7 @@ export default function ExamApp({ initialFiles = [], onExit, onLibrary, cachedRe
     return (
       <div className="eh-page">
         <div className="eh-header">
-          <button className="eh-back-btn" onClick={() => setCsStep('wrongbook')}>
+          <button className="eh-back-btn" onClick={() => { if (enteredViaFeature && initialStep === 'redo' && onExit) onExit(); else setCsStep('wrongbook'); }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
           <div className="eh-header-title">重做错题 ({redoIndex + 1}/{redoQuestions.length})</div>
@@ -1726,7 +1730,7 @@ export default function ExamApp({ initialFiles = [], onExit, onLibrary, cachedRe
           )}
 
           <button className="wb-action-primary-btn" onClick={handleRedoFinish}>
-            返回错题本
+            {enteredViaFeature && initialStep === 'redo' ? '完成' : '返回错题本'}
           </button>
         </div>
       </div>
