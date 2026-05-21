@@ -794,10 +794,18 @@
   border-radius: 6px;
   margin-left: 4px;
 }
+.cv-review-item-wrap {
+  display: flex;
+  flex-direction: column;
+}
 .cv-review-subtitle {
   font-size: 11px;
-  color: #999;
-  padding: 2px 0 0 22px;
+  color: #43A047;
+  padding: 2px 0 2px 22px;
+  cursor: pointer;
+}
+.cv-review-subtitle:active {
+  text-decoration: underline;
 }
 
 /* Scoped views (inside exam) */
