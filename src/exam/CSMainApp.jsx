@@ -44,6 +44,8 @@ export default function CSMainApp() {
   const [examInitialStep, setExamInitialStep] = useState(null);
   const [examReturnRoute, setExamReturnRoute] = useState(null);
   const [quickGradeMode, setQuickGradeMode] = useState(false);
+  const [blankPaperFiles, setBlankPaperFiles] = useState([]);
+  const [blankProcessing, setBlankProcessing] = useState(false);
 
   const showToast = (msg) => {
     setToast(msg);
@@ -414,6 +416,15 @@ export default function CSMainApp() {
             setPracticePaper(paper);
             setRoute('practice-paper');
           }}
+          onGenerateBlank={(thumbUrl) => {
+            setBlankProcessing(true);
+            // 模拟 AI 去手写处理（实际接入时替换为真实 API）
+            setTimeout(() => {
+              setBlankPaperFiles([thumbUrl]);
+              setBlankProcessing(false);
+              setRoute('blank-paper-list');
+            }, 2000);
+          }}
           onTabChange={(tab) => {
             if (tab === 'all-notebook') setRoute('ai-notebook');
             else if (tab === 'wrongbook-redo') {
@@ -431,6 +442,14 @@ export default function CSMainApp() {
             }
           }}
         />
+        {blankProcessing && (
+          <div className="cs-blank-loading">
+            <div className="cs-blank-loading-inner">
+              <div className="cs-blank-spinner" />
+              <p>AI 正在去除手写内容...</p>
+            </div>
+          </div>
+        )}
       </>
     );
   }
@@ -541,6 +560,25 @@ export default function CSMainApp() {
           if (practicePaper._from === 'notebook') setRoute('ai-notebook');
           else if (practicePaper._from === 'chat') setRoute('ai-assistant');
           else setRoute('exam-workbench');
+        }}
+      />
+    );
+  }
+
+  // === Blank Paper List (空白试卷预览) ===
+  if (route === 'blank-paper-list' && blankPaperFiles.length > 0) {
+    return (
+      <DocListPage
+        files={blankPaperFiles}
+        onBack={() => {
+          setBlankPaperFiles([]);
+          setRoute('ai-assistant');
+        }}
+        onAddMore={() => showToast('功能开发中')}
+        onToolSelect={() => {}}
+        onExamAssistant={() => {
+          setBlankPaperFiles([]);
+          setRoute('ai-assistant');
         }}
       />
     );

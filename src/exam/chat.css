@@ -1,13 +1,11 @@
 /* === ChatView === */
 .cv-page {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  height: 812px;
-  max-height: 100vh;
-  max-height: 100dvh;
   background: #f7f8fa;
-  max-width: 375px;
-  margin: 0 auto;
+  z-index: 100;
 }
 
 .cv-header {
@@ -123,6 +121,24 @@
   border-radius: 12px;
   border: 1px solid #e8e8e8;
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.cv-blank-paper-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  padding: 7px 14px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 18px;
+  font-size: 12px;
+  color: #555;
+  cursor: pointer;
+  transition: all .2s;
+}
+.cv-blank-paper-btn:active {
+  background: #f5f5f5;
+  transform: scale(0.97);
 }
 
 /* === Wrong Questions Carousel in SummaryCard === */
@@ -2617,11 +2633,10 @@
 }
 
 .nb-practice-bottom {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  max-width: 375px;
   margin: 0 auto;
   background: #fff;
   border-top: 1px solid #eee;
@@ -2913,11 +2928,10 @@
 }
 
 .em-batch-bar {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  max-width: 375px;
   margin: 0 auto;
   display: flex;
   align-items: center;

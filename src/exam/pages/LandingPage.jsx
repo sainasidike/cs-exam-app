@@ -21,8 +21,45 @@ export default function LandingPage({ onStart, showBack }) {
 
       <div className="ld-container">
 
+        {/* 用户真实声音 */}
+        <div className="ld-section">
+          <div className="ld-section-title">CS内的家长用户说</div>
+          <div className="ld-persona-list">
+            <div className="ld-persona-item">
+              <span className="ld-persona-quote">"</span>
+              <span>孩子试卷丢了或忘记带回，找其他家长拍来试卷，导入扫描全能王去除手写字迹或提升清晰度，然后打印出来让他重做。</span>
+            </div>
+            <div className="ld-persona-item">
+              <span className="ld-persona-quote">"</span>
+              <span>孩子没带作业回家，我和其他同学家长会用扫描全能王将作业扫描成电子版互相分享。</span>
+            </div>
+            <div className="ld-persona-item">
+              <span className="ld-persona-quote">"</span>
+              <span>给孩子请了一对一辅导，我需要扫描批改后的试卷做分析，用来联系家长做反馈和回访。</span>
+            </div>
+          </div>
+          <p className="ld-persona-hook">你已经在用扫描全能王管理试卷了——现在，它能帮你更进一步。</p>
+        </div>
+
+        {/* 已经在用 AI 辅导的家长 */}
+        <div className="ld-section">
+          <div className="ld-section-title">还有些家长，已经在用 AI 辅导</div>
+          <div className="ld-persona-list">
+            <div className="ld-persona-item">
+              <span className="ld-persona-quote">"</span>
+              <span>平时用AI帮孩子分析错题，直接拍照上传，让 AI 讲解思路。</span>
+            </div>
+            <div className="ld-persona-item">
+              <span className="ld-persona-quote">"</span>
+              <span>平时用 AI 拍照核对答案，考前还会让 AI 出几道同类题型，给学生练习。</span>
+            </div>
+          </div>
+          <p className="ld-persona-hook">拍照→AI讲解→出题练习，你已经在这么做了——我们把它变成一步到位。</p>
+        </div>
+
         {/* 对比：以前 vs 现在 */}
         <div className="ld-section">
+          <div className="ld-section-title">从存档到学习</div>
           <div className="ld-compare">
             <div className="ld-compare-col before">
               <div className="ld-compare-header">以前</div>
@@ -43,82 +80,42 @@ export default function LandingPage({ onStart, showBack }) {
           </div>
         </div>
 
-        <div className="ld-divider" />
-
         {/* 用户故事 */}
         <div className="ld-section">
-          <div className="ld-section-title">一个晚上的5分钟</div>
+          <div className="ld-section-title">晚饭后的5分钟</div>
+          <div className="ld-story-screenshots">
+            <img src="/screenshots/story-left.png" alt="批改结果" />
+            <img src="/screenshots/story-right.png" alt="AI讲解" />
+          </div>
           <div className="ld-story">
-            <p className="ld-story-scene">周三晚上，小雨妈妈下班到家。书包里翻出一张语文试卷——<strong>52分</strong>。</p>
-            <p className="ld-story-scene">她打开扫描全能王，对着试卷拍了一张。</p>
-            <div className="ld-story-beat">
-              <span className="ld-story-time">10秒后</span>
-              <span className="ld-story-what">4道错题标红，薄弱点：字音辨析、词义理解</span>
-            </div>
-            <div className="ld-story-beat">
-              <span className="ld-story-time">第2分钟</span>
-              <span className="ld-story-what">点"开始讲解"，把手机递给孩子。AI像家教一样一步步讲第6题</span>
-            </div>
-            <div className="ld-story-beat">
-              <span className="ld-story-time">第4分钟</span>
-              <span className="ld-story-what">孩子说"懂了"，AI出了3道同类型练习题</span>
-            </div>
-            <div className="ld-story-beat">
-              <span className="ld-story-time">第5分钟</span>
-              <span className="ld-story-what">做完练习，对了2道。错的那道自动进错题本</span>
+            <p className="ld-story-scene">周三晚上8点，刚收拾完碗筷。儿子把数学试卷揉成一团塞在书包最底下——<strong>58分</strong>。</p>
+            <p className="ld-story-scene">你想帮他看看错在哪，翻开试卷——应用题的解题步骤你也看不太懂了。</p>
+            <p className="ld-story-scene">你打开扫描全能王，对着试卷拍了一张。皱巴巴的卷子自动去阴影、矫正，每个字都看得清清楚楚。</p>
+            <div className="ld-story-beats">
+              <div className="ld-story-beat">
+                <span className="ld-story-time">10秒后</span>
+                <span className="ld-story-what">5道错题自动标出，薄弱点：分数运算、行程问题</span>
+              </div>
+              <div className="ld-story-beat">
+                <span className="ld-story-time">第2分钟</span>
+                <span className="ld-story-what">你把手机递给儿子，AI正在一步步讲第3大题——比你讲得有耐心</span>
+              </div>
+              <div className="ld-story-beat">
+                <span className="ld-story-time">第4分钟</span>
+                <span className="ld-story-what">他说"哦！原来要先算速度差"，AI马上出了2道类似的练</span>
+              </div>
+              <div className="ld-story-beat">
+                <span className="ld-story-time">第5分钟</span>
+                <span className="ld-story-what">练完了，对了1道，错的自动进错题本。你全程没发火</span>
+              </div>
             </div>
             <div className="ld-story-later">
-              <p><strong>周六</strong>，手机提醒：本周4道错题待巩固。</p>
-              <p>小雨做完，答对3道——自动移除。错题本从4道变成1道。</p>
-              <p><strong>下周</strong>，新试卷拿回来。同样的知识点——这次全对了。</p>
+              <p><strong>周六早上</strong>，手机提醒：本周5道错题待巩固。</p>
+              <p>儿子花了8分钟做完，答对4道——自动移除。错题本只剩1道。</p>
+              <p><strong>两周后</strong>，月考卷拿回来。行程问题——满分。你没请家教，也没吼他。</p>
             </div>
           </div>
         </div>
-
-        <div className="ld-divider" />
-
-        {/* 为什么是扫描全能王 */}
-        <div className="ld-section">
-          <div className="ld-section-title">为什么不用搜题App？</div>
-          <div className="ld-diff-table">
-            <div className="ld-diff-row header">
-              <div className="ld-diff-cell"></div>
-              <div className="ld-diff-cell">搜题App</div>
-              <div className="ld-diff-cell highlight">扫描全能王</div>
-            </div>
-            <div className="ld-diff-row">
-              <div className="ld-diff-cell label">模式</div>
-              <div className="ld-diff-cell">拍一道题，搜答案</div>
-              <div className="ld-diff-cell highlight">拍整张试卷，全局诊断</div>
-            </div>
-            <div className="ld-diff-row">
-              <div className="ld-diff-cell label">结果</div>
-              <div className="ld-diff-cell">给答案，自己看懂</div>
-              <div className="ld-diff-cell highlight">逐题讲解 + 练习，练到会</div>
-            </div>
-            <div className="ld-diff-row">
-              <div className="ld-diff-cell label">错题</div>
-              <div className="ld-diff-cell">自己手动抄</div>
-              <div className="ld-diff-cell highlight">自动收录、自动消化</div>
-            </div>
-            <div className="ld-diff-row">
-              <div className="ld-diff-cell label">视角</div>
-              <div className="ld-diff-cell">这道题答案是什么</div>
-              <div className="ld-diff-cell highlight">孩子哪个知识点不行</div>
-            </div>
-            <div className="ld-diff-row">
-              <div className="ld-diff-cell label">成本</div>
-              <div className="ld-diff-cell">装App + 注册 + 付费</div>
-              <div className="ld-diff-cell highlight">你已经装了，多按一步</div>
-            </div>
-          </div>
-          <div className="ld-diff-summary">
-            搜题App解决的是"这道题答案是什么"。<br/>
-            <strong>我们解决的是"这张试卷暴露了什么问题，怎么彻底解决"。</strong>
-          </div>
-        </div>
-
-        <div className="ld-divider" />
 
         {/* CS天然优势 */}
         <div className="ld-section">
@@ -173,11 +170,6 @@ export default function LandingPage({ onStart, showBack }) {
 
       </div>
 
-      {/* 底部 CTA */}
-      <div className="ld-bottom">
-        <button className="ld-try-btn" onClick={onStart}>立即体验</button>
-        <p className="ld-bottom-hint">下次拍试卷的时候，多点一步试试</p>
-      </div>
     </div>
   );
 }

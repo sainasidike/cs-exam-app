@@ -14,7 +14,7 @@ import ActionButtons from './ActionButtons.jsx';
 import PracticeCard from './PracticeCard.jsx';
 import InputBar from './InputBar.jsx';
 
-export default function ChatView({ files, cachedExamId, cachedResult, onBack, onTabChange, onScan, onCamera, onPickDoc, onManageExams, onSavePaper, autoStart }) {
+export default function ChatView({ files, cachedExamId, cachedResult, onBack, onTabChange, onScan, onCamera, onPickDoc, onManageExams, onSavePaper, onGenerateBlank, autoStart }) {
   const [messages, setMessages] = useState([]);
   const [phase, setPhase] = useState('idle');
   const [showInput, setShowInput] = useState(false);
@@ -338,7 +338,7 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
         date: `${satDate.getMonth() + 1}/${satDate.getDate()}`,
         daysLeft: dayOfWeek === 6 ? 0 : diffDays(satDate),
         isActive: dayOfWeek === 6,
-        subtitle: weekWrong.length > 0 ? `本周新增 ${weekWrong.length} 道错题待巩固` : '本周暂无新错题',
+        subtitle: weekWrong.length > 0 ? `本周攒了 ${weekWrong.length} 道错题，花5分钟消灭几道？` : '本周暂无新错题',
         count: weekWrong.length,
       });
 
@@ -1186,6 +1186,10 @@ export default function ChatView({ files, cachedExamId, cachedResult, onBack, on
                 {currentExamThumb && (
                   <div className="cv-doc-viewer">
                     <img className="cv-doc-viewer-img" src={currentExamThumb} alt="试卷" />
+                    <button className="cv-blank-paper-btn" onClick={() => onGenerateBlank?.(currentExamThumb)}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                      生成空白试卷
+                    </button>
                   </div>
                 )}
                 {messages.map(renderMessage)}
